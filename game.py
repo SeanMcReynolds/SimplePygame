@@ -34,10 +34,10 @@ class Player(pygame.sprite.Sprite):
         else:
             return False
         
-class Food(pygame.sprite.Sprite):
+class Point(pygame.sprite.Sprite):
     # Constructor
     def __init__(self):
-        super(Food, self).__init__()
+        super(Point, self).__init__()
         self.color = random_color()
         self.radius = 10
         self.image = pygame.Surface((self.radius*2, self.radius*2), pygame.SRCALPHA, 32)
@@ -66,9 +66,9 @@ pygame.display.set_caption("player")
 # Create clock to later control frame rate
 clock = pygame.time.Clock()
 
-meals = pygame.sprite.Group()
+points = pygame.sprite.Group()
 for i in range(100):
-    meals.add(Food())
+    points.add(Point())
 
 p1 = Player(1100,300, solid_rand_color())
 p2 = Player(100,300, solid_rand_color())
@@ -77,7 +77,7 @@ players.add(p1)
 players.add(p2)
 
 objects = pygame.sprite.Group()
-objects.add(meals)
+objects.add(points)
 objects.add(players)
 
 # Main game loop
@@ -123,11 +123,11 @@ while running:
     for player in players:
         for x in objects:
             if not player is x and player.collision(x):
-                if type(x) == Food:
+                if type(x) == Point:
                     x.relocate()
                     player.count += 1
 
-    meals.draw(screen)
+    points.draw(screen)
     players.draw(screen)
 
     # Update the display
