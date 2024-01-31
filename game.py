@@ -125,7 +125,9 @@ while running:
             if not player is x and player.collision(x):
                 if type(x) == Point:
                     x.relocate()
-                    player.count += 1
+                    player.count += 1'=
+                    if player.count == 10:
+                        running = False
 
     points.draw(screen)
     players.draw(screen)
