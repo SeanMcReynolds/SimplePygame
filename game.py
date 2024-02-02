@@ -33,11 +33,13 @@ class Player(pygame.sprite.Sprite):
             return True
         else:
             return False
+    def relocate(self):
+        self.rect.center = (random.randint(10,1190),random.randint(10,590))
         
-class Point(pygame.sprite.Sprite):
+class Food(pygame.sprite.Sprite):
     # Constructor
     def __init__(self):
-        super(Point, self).__init__()
+        super(Food, self).__init__()
         self.color = random_color()
         self.radius = 10
         self.image = pygame.Surface((self.radius*2, self.radius*2), pygame.SRCALPHA, 32)
@@ -47,8 +49,19 @@ class Point(pygame.sprite.Sprite):
     def relocate(self):
         self.rect.center = (random.randint(10,1190),random.randint(10,590))
         
-class Scoreboard(pygame.sprite.Sprite):pass
+class Scoreboard(pygame.sprite.Sprite):
+    def __init__(self):
+        self.color = (255,255,255)
+        self.count = 0
+        self.font = pygame.font.SysFont("comicsans",50, True , True)
+        self.text = self.font.render("Score : "+str(self.count),1,self.color)
 
+    def show_score(self, screen):
+        screen.blit(self.text, (100 ,100))
+
+    def score_up(self):
+        self.count += 1
+        self.text = self.font.render("Score : "+str(self.count),1,self.color)
 
 
 
@@ -61,14 +74,14 @@ pygame.init()
 screen_width = 1200
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("player")
+pygame.display.set_caption("first to 100")
 
 # Create clock to later control frame rate
 clock = pygame.time.Clock()
 
-points = pygame.sprite.Group()
+meals = pygame.sprite.Group()
 for i in range(100):
-    points.add(Point())
+    meals.add(Food())
 
 p1 = Player(1100,300, solid_rand_color())
 p2 = Player(100,300, solid_rand_color())
@@ -77,7 +90,7 @@ players.add(p1)
 players.add(p2)
 
 objects = pygame.sprite.Group()
-objects.add(points)
+objects.add(meals)
 objects.add(players)
 
 # Main game loop
@@ -120,16 +133,22 @@ while running:
     if keys[pygame.K_s]:
         p2.move(0,2)
         
+        
     for player in players:
+        for other in players:
+            if player != other and player.rect.colliderect(other.rect):
+                screen.fill((255,0,0))
+                player.relocate()
         for x in objects:
             if not player is x and player.collision(x):
-                if type(x) == Point:
+                if type(x) == Food:
                     x.relocate()
-                    player.count += 1'=
-                    if player.count == 10:
-                        running = False
+                    player.count += 1
+        if player.count == 100:
+            pygame.quit()
+            sys.exit()
 
-    points.draw(screen)
+    meals.draw(screen)
     players.draw(screen)
 
     # Update the display
