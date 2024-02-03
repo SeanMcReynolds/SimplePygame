@@ -49,20 +49,32 @@ class Food(pygame.sprite.Sprite):
     def relocate(self):
         self.rect.center = (random.randint(10,1190),random.randint(10,590))
         
-class Scoreboard(pygame.sprite.Sprite):
-    def __init__(self):
-        self.color = (255,255,255)
-        self.count = 0
-        self.font = pygame.font.SysFont("comicsans",50, True , True)
-        self.text = self.font.render("Score : "+str(self.count),1,self.color)
+class Scoreboard:
+    def __init__(self, screen):
+        self.screen = screen
+        self.player1_score = 0
+        self.player2_score = 0
+        self.font = pygame.font.Font(None, 32)
 
-    def show_score(self, screen):
-        screen.blit(self.text, (100 ,100))
+    def draw(self):
+        p1_score_text = self.font.render(f"Player 1: {self.player1_score}", True, (255, 255, 255))
+        p2_score_text = self.font.render(f"Player 2: {self.player2_score}", True, (255, 255, 255))
+        self.screen.blit(p1_score_text, (10, 10))
+        self.screen.blit(p2_score_text, (10, 50))
 
-    def score_up(self):
-        self.count += 1
-        self.text = self.font.render("Score : "+str(self.count),1,self.color)
+    def increase_player1_score(self, points):
+        self.player1_score += points
+    
+    def increase_player2_score(self, points):
+        self.player2_score += points
 
+    def p1_win(self):
+        player_1_win = self.font.render(f"Player 1 Wins!", True, (255, 255, 255))
+        self.screen.blit(player_1_win, (10, 10))
+    
+    def p2_win(self):
+        player_2_win = self.font.render(f"Player 2 Wins!", True, (255, 255, 255))
+        self.screen.blit(player_2_win, (10, 50))
 
 
 
@@ -93,6 +105,8 @@ objects = pygame.sprite.Group()
 objects.add(meals)
 objects.add(players)
 
+scoreboard = Scoreboard(screen)
+
 # Main game loop
 running = True
 while running:
@@ -116,42 +130,52 @@ while running:
     #     sq.rect.y += 2
     
     if keys[pygame.K_LEFT]:
-        p1.move(-2,0)
+        p1.move(-4,0)
     if keys[pygame.K_RIGHT]:
-        p1.move(2,0)
+        p1.move(4,0)
     if keys[pygame.K_UP]:
-        p1.move(0,-2)
+        p1.move(0,-4)
     if keys[pygame.K_DOWN]:
-        p1.move(0,2)
+        p1.move(0,4)
     
     if keys[pygame.K_a]:
-        p2.move(-2,0)
+        p2.move(-4,0)
     if keys[pygame.K_d]:
-        p2.move(2,0)
+        p2.move(4,0)
     if keys[pygame.K_w]:
-        p2.move(0,-2)
+        p2.move(0,-4)
     if keys[pygame.K_s]:
-        p2.move(0,2)
+        p2.move(0,4)
         
-        
+    
+
+
+
+
     for player in players:
+        food_collisions = pygame.sprite.spritecollide(player, meals, True)
+        for food in food_collisions:
+            new_food = Food()
+            meals.add(new_food)
+            if player == p1:
+                scoreboard.increase_player1_score(1)
+            elif player == p2:
+                scoreboard.increase_player2_score(1)
         for other in players:
             if player != other and player.rect.colliderect(other.rect):
                 screen.fill((255,0,0))
                 player.relocate()
-        for x in objects:
-            if not player is x and player.collision(x):
-                if type(x) == Food:
-                    x.relocate()
-                    player.count += 1
-        if player.count == 100:
-            pygame.quit()
-            sys.exit()
+        if scoreboard.player1_score >= 100:
+            scoreboard.p1_win()
+        if scoreboard.player2_score >= 100:
+            scoreboard.p2_win()
 
     meals.draw(screen)
     players.draw(screen)
+    scoreboard.draw()
 
     # Update the display
+    pygame.display.update()
     pygame.display.flip()
     clock.tick(60)
 
