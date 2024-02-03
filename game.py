@@ -70,11 +70,13 @@ class Scoreboard:
 
     def p1_win(self):
         player_1_win = self.font.render(f"Player 1 Wins!", True, (255, 255, 255))
-        self.screen.blit(player_1_win, (10, 10))
+        text_rect = player_1_win.get_rect(center=(1200/2, 600/2))
+        self.screen.blit(player_1_win, text_rect)
     
     def p2_win(self):
         player_2_win = self.font.render(f"Player 2 Wins!", True, (255, 255, 255))
-        self.screen.blit(player_2_win, (10, 50))
+        text_rect = player_2_win.get_rect(center=(1200/2, 600/2))
+        self.screen.blit(player_2_win, text_rect)
 
 
 
